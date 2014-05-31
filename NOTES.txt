@@ -207,6 +207,26 @@ Difference only clear in stereo mode.
 Don't know what's going on here, maybe the DIY antenna is just not good.
 
 
+IF processing
+-------------
+
+Idea: Filter I/Q samples with 3rd order Butterworth filter
+instead of 10th order FIR filter.
+Implemented in branch "iirfilter".
+Speed is unchanged.
+Sound quality is not much changed for strong stations.
+Sound quality is a bit worse for weak stations (at 1 MS/s).
+Conclusion: not worthwhile.
+
+Idea: Downsample I/Q samples to ~ 250 kS/s BEFORE quadrature detection
+instead of immediately after detection. Would reduce amount of work in
+I/Q filtering for same or higher FIR filter order.
+Implemented in branch "filterif".
+CPU time reduced by ~ 25%.
+Sound quality very slightly worse.
+Conclusion: not worthwhile.
+
+
 Local radio stations
 --------------------
 
