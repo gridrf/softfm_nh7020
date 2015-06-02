@@ -3,6 +3,7 @@
 cmake_minimum_required(VERSION 2.4)
 project(SoftFM)
 
+find_package(Threads)
 find_package(PkgConfig)
 find_package(ALSA REQUIRED)
 
@@ -49,6 +50,7 @@ include_directories(
     ${EXTRA_INCLUDES} )
 
 target_link_libraries(softfm
+    ${CMAKE_THREAD_LIBS_INIT}
     ${RTLSDR_LIBRARIES}
     ${ALSA_LIBRARIES}
     ${EXTRA_LIBS} )
