@@ -144,7 +144,7 @@ void adjust_gain(SampleVector& samples, double gain)
  * This code runs in a separate thread.
  * The RTL-SDR library is not capable of buffering large amounts of data.
  * Running this in a background thread ensures that the time between calls
- * to RtlSdrSource::get_samples() is very short. 
+ * to RtlSdrSource::get_samples() is very short.
  */
 void read_source_data(RtlSdrSource *rtlsdr, DataBuffer<IQSample> *buf)
 {
@@ -219,7 +219,7 @@ void usage()
             "  -d devidx     RTL-SDR device index, 'list' to show device list (default 0)\n"
             "  -g gain       Set LNA gain in dB, or 'auto' (default auto)\n"
             "  -a            Enable RTL AGC mode (default disabled)\n"
-            "  -s ifrate     IF sample rate in Hz (default 1000000, min 900001)\n"
+            "  -s ifrate     IF sample rate in Hz (default 1000000, valid range: [225001, 300000] U [900000, 3200000])\n"
             "  -r pcmrate    Audio sample rate in Hz (default 48000 Hz)\n"
             "  -M            Disable stereo decoding\n"
             "  -R filename   Write audio data as raw S16_LE samples\n"
@@ -355,8 +355,11 @@ int main(int argc, char **argv)
                 }
                 break;
             case 's':
-                // NOTE: RTL does not suppor sample rate 900 kS/s or lower
-                if (!parse_dbl(optarg, ifrate) || ifrate <= 900000) {
+                // NOTE: RTL does not support some sample rates below 900 kS/s
+                // Also, max sampling rate is 3.2 MS/s
+                if (!parse_dbl(optarg, ifrate) ||
+                     (ifrate <= 225000) || (ifrate > 3200000) ||
+                     ((ifrate > 300000) && (ifrate <= 900000))) {
                     badarg("-s");
                 }
                 break;
