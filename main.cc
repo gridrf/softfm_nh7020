@@ -153,7 +153,7 @@ void read_source_data(RtlSdrSource *rtlsdr, DataBuffer<IQSample> *buf)
     while (!stop_flag.load()) {
 
         if (!rtlsdr->get_samples(iqsamples)) {
-            fprintf(stderr, "ERROR: RtlSdr: %s\n", rtlsdr->error().c_str());
+            fprintf(stderr, "ERROR: NH7020: %s\n", rtlsdr->error().c_str());
             exit(1);
         }
 

@@ -3,6 +3,7 @@
 #include <cstring>
 
 #include "RtlSdrSource.h"
+#include "ad9361.h"
 
 using namespace std;
 
@@ -23,6 +24,12 @@ RtlSdrSource::RtlSdrSource(int dev_index)
         m_error =  "Failed to open nh7020 device (";
         m_error += errno;
         m_error += ")";
+    }
+
+    luts.resize(4096);
+
+    for(int i=0;i<4096;i++){
+        luts[i] = (i - 2047.5) / 2047.5;
     }
 }
 
@@ -57,6 +64,7 @@ bool RtlSdrSource::configure(uint32_t sample_rate,
 	iio_channel_attr_write_longlong(phy_chn, "rf_bandwidth", sample_rate);
 	iio_channel_attr_write_longlong(phy_chn, "sampling_frequency", sample_rate);
 
+        ad9361_set_bb_rate(phydev, sample_rate);
 	
 
 	struct iio_channel* phy = iio_device_find_channel(phydev, "altvoltage0", true);
@@ -89,10 +97,7 @@ bool RtlSdrSource::configure(uint32_t sample_rate,
 
     // set RTL AGC mode
     // set block length
-    m_block_length = (block_length < 4096) ? 4096 :
-                     (block_length > 1024 * 1024) ? 1024 * 1024 :
-                     block_length;
-    m_block_length -= m_block_length % 4096;
+    m_block_length = sample_rate / 4;
 
     // reset buffer to start streaming
 
@@ -181,12 +186,12 @@ bool RtlSdrSource::get_samples(IQSampleVector& samples)
 */
     samples.resize(m_block_length);
     for (int i = 0; i < m_block_length; i++) {
-		int idx = i * 2;
-        int16_t re = prx_buffer[idx];
-		int16_t im = prx_buffer[idx +1];
+        int16_t re = prx_buffer[i * 2];
+	int16_t im = prx_buffer[i * 2 +1];
 
-        samples[i] = IQSample( re / IQSample::value_type(2047),
-                               im / IQSample::value_type(2047) );
+        //samples[i] = IQSample( re / IQSample::value_type(2047),im / IQSample::value_type(2047) );
+
+        samples[i] = IQSample( luts[re+2047],luts[im+2047]);
     }
 
     return true;

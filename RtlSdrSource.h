@@ -13,7 +13,7 @@ class RtlSdrSource
 {
 public:
 
-    static const int default_block_length = 65536;
+    static const int default_block_length = 1024*1024;
 
     /** Open RTL-SDR device. */
     RtlSdrSource(int dev_index);
@@ -89,6 +89,7 @@ private:
     int                 m_block_length;
     std::string         m_devname;
     std::string         m_error;
+    std::vector<float> luts;
 };
 
 #endif

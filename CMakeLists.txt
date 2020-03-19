@@ -24,6 +24,15 @@ if (LIBIIO_FOUND)
     message(STATUS "LIBIIO_DEFINITIONS: ${LIBIIO_DEFINITIONS}")
 endif()
 
+find_package(libad9361)
+
+if (LIBAD9361_FOUND)
+    message(STATUS "LIBAD9361_INCLUDE_DIRS: ${LIBAD9361_INCLUDE_DIRS}")
+    message(STATUS "LIBAD9361_LIBRARIES: ${LIBAD9361_LIBRARIES}")
+    message(STATUS "LIBAD9361_DEFINITIONS: ${LIBAD9361_DEFINITIONS}")
+    include_directories(${LIBAD9361_INCLUDE_DIRS})
+    add_definitions(-DHAS_AD9361_IIO)
+endif()
 
 # Compiler flags.
 set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O2 -ffast-math -ftree-vectorize ${EXTRA_FLAGS}")
@@ -37,12 +46,14 @@ add_executable(softfm
 
 include_directories(
     ${LIBIIO_INCLUDE_DIRS}
+    ${LIBAD9361_LIBRARIES}
     ${ALSA_INCLUDE_DIRS}
     ${EXTRA_INCLUDES} )
 
 target_link_libraries(softfm
     ${CMAKE_THREAD_LIBS_INIT}
     ${LIBIIO_LIBRARIES}
+    ${LIBAD9361_LIBRARIES}
     ${ALSA_LIBRARIES}
     ${EXTRA_LIBS} )
 
