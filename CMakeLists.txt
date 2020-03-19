@@ -7,13 +7,6 @@ find_package(Threads)
 find_package(PkgConfig)
 find_package(ALSA REQUIRED)
 
-# Find RTL-SDR library (for linking).
-pkg_check_modules(PKG_RTLSDR librtlsdr)
-find_path(RTLSDR_INCLUDE_DIR rtl-sdr.h
-          HINT ${PKG_RTLSDR_INCLUDE_DIRS})
-find_library(RTLSDR_LIBRARY librtlsdr.a
-             HINT ${PKG_RTLSDR_LIBRARY_DIRS})
-
 # Find libusb
 pkg_check_modules(PKG_LIBUSB libusb-1.0)
 find_path(LIBUSB_INCLUDE_DIR libusb.h
@@ -31,8 +24,6 @@ if (LIBIIO_FOUND)
     message(STATUS "LIBIIO_DEFINITIONS: ${LIBIIO_DEFINITIONS}")
 endif()
 
-set(RTLSDR_INCLUDE_DIRS ${RTLSDR_INCLUDE_DIR} ${LIBUSB_INCLUDE_DIR})
-set(RTLSDR_LIBRARIES    ${RTLSDR_LIBRARY} ${LIBUSB_LIBRARY})
 
 # Compiler flags.
 set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O2 -ffast-math -ftree-vectorize ${EXTRA_FLAGS}")
@@ -45,7 +36,7 @@ add_executable(softfm
     AudioOutput.cc )
 
 include_directories(
-    ${RTLSDR_INCLUDE_DIRS}
+    ${LIBIIO_INCLUDE_DIRS}
     ${ALSA_INCLUDE_DIRS}
     ${EXTRA_INCLUDES} )
 
