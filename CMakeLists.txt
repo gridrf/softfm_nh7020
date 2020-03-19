@@ -1,6 +1,6 @@
 # CMake definitions for SoftFM
 
-cmake_minimum_required(VERSION 2.4)
+cmake_minimum_required(VERSION 2.8.9)
 project(SoftFM)
 
 find_package(Threads)
@@ -22,13 +22,13 @@ find_path(LIBUSB_INCLUDE_DIR libusb.h
 find_library(LIBUSB_LIBRARY usb-1.0
              HINT ${PKG_LIBUSB_LIBRARY_DIRS})
 
-if(RTLSDR_INCLUDE_DIR AND RTLSDR_LIBRARY)
-    message(STATUS "Found librtlsdr: ${RTLSDR_INCLUDE_DIR}, ${RTLSDR_LIBRARY}")
-else()
-    message(WARNING "Can not find Osmocom RTL-SDR library")
-    message("Try again with environment variable PKG_CONFIG_PATH")
-    message("or with -DRTLSDR_INCLUDE_DIR=/path/rtlsdr/include")
-    message("        -DRTLSDR_LIBRARY=/path/rtlsdr/lib/librtlsdr.a")
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
+find_package(libiio 0.9 REQUIRED)
+
+if (LIBIIO_FOUND)
+    message(STATUS "LIBIIO_INCLUDE_DIRS: ${LIBIIO_INCLUDE_DIRS}")
+    message(STATUS "LIBIIO_LIBRARIES: ${LIBIIO_LIBRARIES}")
+    message(STATUS "LIBIIO_DEFINITIONS: ${LIBIIO_DEFINITIONS}")
 endif()
 
 set(RTLSDR_INCLUDE_DIRS ${RTLSDR_INCLUDE_DIR} ${LIBUSB_INCLUDE_DIR})
@@ -51,7 +51,7 @@ include_directories(
 
 target_link_libraries(softfm
     ${CMAKE_THREAD_LIBS_INIT}
-    ${RTLSDR_LIBRARIES}
+    ${LIBIIO_LIBRARIES}
     ${ALSA_LIBRARIES}
     ${EXTRA_LIBS} )
 

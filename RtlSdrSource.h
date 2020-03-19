@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "SoftFM.h"
+#include "iio.h"
 
 
 class RtlSdrSource
@@ -80,7 +81,11 @@ public:
     static std::vector<std::string> get_device_names();
 
 private:
-    struct rtlsdr_dev * m_dev;
+    struct iio_context * m_dev;
+	struct iio_channel *rx0_i;
+	struct iio_channel *rx0_q;
+	struct iio_buffer  *rxbuf;
+	short *prx_buffer;
     int                 m_block_length;
     std::string         m_devname;
     std::string         m_error;

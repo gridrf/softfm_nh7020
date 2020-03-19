@@ -295,7 +295,7 @@ int main(int argc, char **argv)
     int     devidx  = 0;
     int     lnagain = INT_MIN;
     bool    agcmode = false;
-    double  ifrate  = 1.0e6;
+    double  ifrate  = 2.5e6;
     int     pcmrate = 48000;
     bool    stereo  = true;
     enum OutputMode { MODE_RAW, MODE_WAV, MODE_ALSA };
@@ -307,7 +307,7 @@ int main(int argc, char **argv)
     double  bufsecs = -1;
 
     fprintf(stderr,
-            "SoftFM - Software decoder for FM broadcast radio with RTL-SDR\n");
+            "SoftFM - Software decoder for FM broadcast radio with NH7020\n");
 
     const struct option longopts[] = {
         { "freq",       1, NULL, 'f' },
@@ -348,16 +348,17 @@ int main(int argc, char **argv)
                     if (!parse_dbl(optarg, tmpgain)) {
                         badarg("-g");
                     }
-                    long int tmpgain2 = lrint(tmpgain * 10);
-                    if (tmpgain2 <= INT_MIN || tmpgain2 >= INT_MAX) {
+                    long int tmpgain2 = lrint(tmpgain);
+                    if (tmpgain2 <= 0 || tmpgain2 >= 89) {
                         badarg("-g");
                     }
                     lnagain = tmpgain2;
                 }
                 break;
             case 's':
-                // NOTE: RTL does not support some sample rates below 900 kS/s
+                // NOTE: RTL does not support some sample rates below 900 kS/s,and NH7020 is 2.5msps
                 // Also, max sampling rate is 3.2 MS/s
+				// Now, situation is changed, max sampling rate is 64MSPS,but fm band is only 20mhz
                 if (!parse_dbl(optarg, ifrate) ||
                      (ifrate < 225001) || (ifrate > 3200000) ||
                      ((ifrate > 300000) && (ifrate < 900001))) {
@@ -447,19 +448,19 @@ int main(int argc, char **argv)
     // Open RTL-SDR device.
     RtlSdrSource rtlsdr(devidx);
     if (!rtlsdr) {
-        fprintf(stderr, "ERROR: RtlSdr: %s\n", rtlsdr.error().c_str());
+        fprintf(stderr, "ERROR: NH7020: %s\n", rtlsdr.error().c_str());
         exit(1);
     }
 
     // Check LNA gain.
-    if (lnagain != INT_MIN) {
+    if (lnagain >=0) {
         vector<int> gains = rtlsdr.get_tuner_gains();
         if (find(gains.begin(), gains.end(), lnagain) == gains.end()) {
-            if (lnagain != INT_MIN + 1)
-                fprintf(stderr, "ERROR: LNA gain %.1f dB not supported by tuner\n", lnagain * 0.1);
+            if (lnagain > 89)
+                fprintf(stderr, "ERROR: LNA gain %d dB not supported by tuner\n", lnagain);
             fprintf(stderr, "Supported LNA gains: ");
             for (int g: gains)
-                fprintf(stderr, " %.1f dB ", 0.1 * g);
+                fprintf(stderr, " %d dB ", g);
             fprintf(stderr, "\n");
             exit(1);
         }
@@ -469,7 +470,7 @@ int main(int argc, char **argv)
     rtlsdr.configure(ifrate, tuner_freq, lnagain,
                      RtlSdrSource::default_block_length, agcmode);
     if (!rtlsdr) {
-        fprintf(stderr, "ERROR: RtlSdr: %s\n", rtlsdr.error().c_str());
+        fprintf(stderr, "ERROR: NH7020: %s\n", rtlsdr.error().c_str());
         exit(1);
     }
 
@@ -479,13 +480,13 @@ int main(int argc, char **argv)
     if (lnagain == INT_MIN)
         fprintf(stderr, "LNA gain:          auto\n");
     else
-        fprintf(stderr, "LNA gain:          %.1f dB\n",
-                0.1 * rtlsdr.get_tuner_gain());
+        fprintf(stderr, "LNA gain:          %d dB\n",
+                 rtlsdr.get_tuner_gain());
 
     ifrate = rtlsdr.get_sample_rate();
     fprintf(stderr, "IF sample rate:    %.0f Hz\n", ifrate);
 
-    fprintf(stderr, "RTL AGC mode:      %s\n",
+    fprintf(stderr, "NH7020 AGC mode:      %s\n",
             agcmode ? "enabled" : "disabled");
 
     // Create source data queue.
