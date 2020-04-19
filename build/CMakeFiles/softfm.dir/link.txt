@@ -1,1 +1,0 @@
-/usr/bin/c++   -Wall -std=c++11 -O2 -ffast-math -ftree-vectorize    CMakeFiles/softfm.dir/main.cc.o CMakeFiles/softfm.dir/RtlSdrSource.cc.o CMakeFiles/softfm.dir/Filter.cc.o CMakeFiles/softfm.dir/FmDecode.cc.o CMakeFiles/softfm.dir/AudioOutput.cc.o  -o softfm -rdynamic -lpthread -liio /usr/local/lib/libad9361.so -lasound -Wl,-rpath,/usr/local/lib: 
