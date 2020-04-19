@@ -35,7 +35,7 @@ if (LIBAD9361_FOUND)
 endif()
 
 # Compiler flags.
-set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O2 -ffast-math -ftree-vectorize ${EXTRA_FLAGS}")
+set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O3 -ffast-math -ftree-vectorize ${EXTRA_FLAGS}")
 
 add_executable(softfm
     main.cc
