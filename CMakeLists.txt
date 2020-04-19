@@ -46,7 +46,7 @@ add_executable(softfm
 
 include_directories(
     ${LIBIIO_INCLUDE_DIRS}
-    ${LIBAD9361_LIBRARIES}
+    ${LIBAD9361_INCLUDE_DIRS}
     ${ALSA_INCLUDE_DIRS}
     ${EXTRA_INCLUDES} )
 

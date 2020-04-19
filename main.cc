@@ -207,7 +207,8 @@ static void handle_sigterm(int sig)
     msg += ", stopping ...\n";
 
     const char *s = msg.c_str();
-    write(STDERR_FILENO, s, strlen(s));
+   // write(STDERR_FILENO, s, strlen(s));
+   printf("%s\n", s);
 }
 
 
@@ -356,12 +357,11 @@ int main(int argc, char **argv)
                 }
                 break;
             case 's':
-                // NOTE: RTL does not support some sample rates below 900 kS/s,and NH7020 is 2.5msps
+                // NOTE: RTL does not support some sample rates below 900 kS/s
                 // Also, max sampling rate is 3.2 MS/s
 				// Now, situation is changed, max sampling rate is 64MSPS,but fm band is only 20mhz
                 if (!parse_dbl(optarg, ifrate) ||
-                     (ifrate < 225001) || (ifrate > 3200000) ||
-                     ((ifrate > 300000) && (ifrate < 900001))) {
+                     (ifrate < 200000) || (ifrate > 3200000)) {
                     badarg("-s");
                 }
                 break;
@@ -624,7 +624,7 @@ int main(int argc, char **argv)
         audio_level = 0.95 * audio_level + 0.05 * audio_rms;
 
         // Set nominal audio volume.
-        adjust_gain(audiosamples, 0.5);
+        //adjust_gain(audiosamples, 0.5);
 
         // Show statistics.
         fprintf(stderr,
